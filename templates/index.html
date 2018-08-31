@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" crossorigin="anonymous">
+</head>
+<body>
+    <div id="app" style="margin-left: 100px">
+        <img style="width: 300px" src="https://sourcedexter.com/wp-content/uploads/2017/09/flask-python.png">
+        <h2>---REEEESTfullllllll API---</h2>
+        <table>
+            <tr
+             v-for="thing in things" style="margin: 10px">
+                <td><b>{{ thing.name }}</b></td>
+                <td><button @click="dele(thing.name)" class="btn-sm btn-danger" >DELETE</button></td>
+            </tr>
+        </table>
+        <h2>-----------------------------------</h2>
+        <div  class="form-group">
+            <input type="text" v-model="names.name" @keyup.enter="post">
+            <button @click="post" class="btn btn-primary">SEND</button>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.6"></script>
+    <script>
+        new Vue({
+   el: '#app',
+   data:{
+       test: "TEST",
+       names: {name: ""},
+       things: ['name', 's']
+   },
+   methods: {
+       post() {
+           return this.$http.post("http://localhost:5000/come", this.names).then(value =>
+            location.reload(true)
+           )
+       },
+       getIt(){
+           return this.$http.get("http://localhost:5000/come")
+
+       },
+       dele(name){
+           return this.$http.delete("http://localhost:5000/come/" + name).then(value =>
+            location.reload(true)
+           )
+       }
+   },
+   created(){
+       this.getIt().then(value => {
+           console.log(value.body);
+           this.things = value.body;
+       });
+   }
+});
+    </script> <!-- Main script -->
+</body>
+</html>
