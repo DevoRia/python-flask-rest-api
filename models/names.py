@@ -3,6 +3,8 @@ import uuid
 from cassandra.cqlengine import columns
 from cassandra.cqlengine.models import Model
 
+__author__ = "Riabchenko Vadim"
+
 
 class Base(Model):
     __abstract__ = True

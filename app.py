@@ -1,15 +1,14 @@
-from functools import wraps
 from cassandra.cqlengine import connection
 from flask import Flask, jsonify, request, render_template, Response
 from flask_cors import CORS
 from flask_pymongo import PyMongo
-import json
 from cassandra.cluster import Cluster
 
 from models.names import Person
 
-KEYSPACE = "cassandra_final_try"
+__author__ = "Riabchenko Vadim"
 
+KEYSPACE = "cassandra_final_try"
 
 def create_app():
     app = Flask(__name__)
