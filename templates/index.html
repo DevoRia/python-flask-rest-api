@@ -13,26 +13,26 @@
             <tr
              v-for="thing in things" style="margin: 10px">
                 <td><b>{{ thing.name }}</b></td>
-                <td><button @click="deleteMongo(thing.name)" class="btn-sm btn-danger" >DELETE</button></td>
+                <td><button @click="dele('come', thing.name)" class="btn-sm btn-danger" >DELETE</button></td>
             </tr>
         </table>
         <h2>-----------------------------------</h2>
         <div  class="form-group">
-            <input type="text" v-model="names.name" @keyup.enter="postMongo">
-            <button @click="postMongo" class="btn btn-primary">SEND</button>
+            <input type="text" v-model="names.name" @keyup.enter="post('come')">
+            <button @click="post('come')" class="btn btn-primary">SEND</button>
         </div>
         <h2>--------CASSANDRA---------</h2>
         <table>
             <tr
              v-for="thing in cass" style="margin: 10px">
                 <td><b>{{ thing.name }}</b></td>
-                <td><button @click="deleteCass(thing.id)" class="btn-sm btn-danger" >DELETE</button></td>
+                <td><button @click="dele('cass', thing.id)" class="btn-sm btn-danger" >DELETE</button></td>
             </tr>
         </table>
         <h2>-----------------------------------</h2>
         <div  class="form-group">
-            <input type="text" v-model="names.name" @keyup.enter="postCass">
-            <button @click="postCass" class="btn btn-primary">SEND</button>
+            <input type="text" v-model="names.name" @keyup.enter="post('cass')">
+            <button @click="post('cass')" class="btn btn-primary">SEND</button>
         </div>
 
     </div>
@@ -49,18 +49,6 @@
        cass: ['name', 's']
    },
    methods: {
-       deleteCass(name){
-           this.dele("cass",name)
-       },
-       postCass(){
-           this.post('cass')
-       },
-       deleteMongo(name){
-           this.dele("come",name)
-       },
-       postMongo(){
-           this.post('come')
-       },
        post(path) {
            return this.$http.post("http://localhost:5000/"+path, this.names).then(value =>
             location.reload(true)
