@@ -1,12 +1,40 @@
-from flask import Flask, jsonify, request, render_template
+from functools import wraps
+from cassandra.cqlengine import connection
+from flask import Flask, jsonify, request, render_template, Response
 from flask_cors import CORS
 from flask_pymongo import PyMongo
+import json
+from cassandra.cluster import Cluster
 
-app = Flask(__name__)
+from models.names import Person
+
+KEYSPACE = "cassandra_final_try"
+
+
+def create_app():
+    app = Flask(__name__)
+
+    app.debug = True
+
+    cluster = Cluster()
+    session = cluster.connect()
+    session.execute(
+        """
+        CREATE KEYSPACE IF NOT EXISTS cassandra_final_try WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+        """)
+    session = cluster.connect(keyspace=KEYSPACE)
+
+    app.config['MONGO_DBNAME'] = 'rest'
+    app.config['MONGO_URI'] = 'mongodb://localhost:27017/rest'
+
+    return app
+
+
+app = create_app()
 CORS(app)
 
-app.config['MONGO_DBNAME'] = 'rest'
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/rest'
+connection.setup(['127.0.0.1'], "cqlengine", protocol_version=3)
+
 mongo = PyMongo(app)
 
 
@@ -37,6 +65,32 @@ def put():
 def dele(id):
     star = mongo.db.stars
     star.delete_one({'name': id})
+    return 'success'
+
+
+@app.route('/cass')
+def hi():
+    persons = Person.objects().all()
+    incomes = []
+    for person in persons:
+        incomes.append({'id': person.get_id(), 'name': person.get_name()})
+    return jsonify(incomes)
+
+
+@app.route('/cass', methods=['POST'])
+def puter():
+    name = request.json['name']
+    if name != "":
+        Person.create(name=name)
+    return 'success'
+
+
+@app.route('/cass/<string:id>', methods=['DELETE'])
+def deleter(id):
+    connection.execute("""
+    DELETE FROM cassandra_final_try.person 
+    WHERE id = %s;
+    """ % id)
     return 'success'
 
 
