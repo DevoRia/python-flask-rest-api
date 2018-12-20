@@ -1,3 +1,4 @@
+from bson import ObjectId
 from cassandra.cqlengine import connection
 from flask import Flask, jsonify, request, render_template, Response
 from flask_cors import CORS
@@ -9,6 +10,7 @@ from models.names import Person
 __author__ = "Riabchenko Vadim"
 
 KEYSPACE = "cassandra_final_try"
+
 
 def create_app():
     app = Flask(__name__)
@@ -38,7 +40,7 @@ mongo = PyMongo(app)
 
 
 @app.route('/come')
-def hello_world():
+def find_all_mongo():
     star = mongo.db.stars
     output = []
     for s in star.find():
@@ -52,7 +54,7 @@ def page():
 
 
 @app.route('/come', methods=['POST'])
-def put():
+def save_mongo():
     star = mongo.db.stars
     name = request.json['name']
     if name != "":
@@ -61,14 +63,14 @@ def put():
 
 
 @app.route('/come/<string:id>', methods=['DELETE'])
-def dele(id):
+def delete_mongo(id):
     star = mongo.db.stars
     star.delete_one({'name': id})
     return 'success'
 
 
 @app.route('/cass')
-def hi():
+def find_all_cassandra():
     persons = Person.objects().all()
     incomes = []
     for person in persons:
@@ -77,7 +79,7 @@ def hi():
 
 
 @app.route('/cass', methods=['POST'])
-def puter():
+def save_cassandra():
     name = request.json['name']
     if name != "":
         Person.create(name=name)
@@ -85,11 +87,8 @@ def puter():
 
 
 @app.route('/cass/<string:id>', methods=['DELETE'])
-def deleter(id):
-    connection.execute("""
-    DELETE FROM cassandra_final_try.person 
-    WHERE id = %s;
-    """ % id)
+def delete_cassandra(id):
+    connection.execute("""DELETE FROM cassandra_final_try.person WHERE id = %s;""" % id)
     return 'success'
 
 
